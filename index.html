@@ -1,0 +1,1080 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ExpenseIQ — Finance Suite</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Share+Tech+Mono&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <div class="logo">
+          ExpenseIQ
+        </div>
+        <div class="header-meta">
+          <div id="current-date"></div>
+          <div>Personal Finance Suite</div>
+        </div>
+      </header>
+
+      <!-- NAV -->
+      <div class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('tracker')">
+          📊 Tracker
+        </button>
+        <button class="nav-tab" onclick="switchTab('tools')">
+          🧮 Calculators
+        </button>
+        <button class="nav-tab" onclick="switchTab('currency')">
+          💱 Currency
+        </button>
+        <button class="nav-tab" onclick="switchTab('savings')">
+          💰 Savings & Invest
+        </button>
+      </div>
+
+      <!-- ══════════════════ TAB: TRACKER ══════════════════ -->
+      <div class="tab-panel active" id="tab-tracker">
+        <div class="summary-grid">
+          <div class="card balance">
+            <div class="card-label">Total Balance</div>
+            <div class="card-amount" id="balance">₹0.00</div>
+            <div class="card-change">Net position</div>
+          </div>
+          <div class="card income">
+            <div class="card-label">Total Income</div>
+            <div class="card-amount" id="total-income">₹0.00</div>
+            <div class="card-change" id="income-count">0 transactions</div>
+          </div>
+          <div class="card expense">
+            <div class="card-label">Total Expenses</div>
+            <div class="card-amount" id="total-expense">₹0.00</div>
+            <div class="card-change" id="expense-count">0 transactions</div>
+          </div>
+        </div>
+
+        <div class="main-grid">
+          <div class="left-col">
+            <div class="form-panel">
+              <div class="panel-title">Add Transaction</div>
+              <div class="type-toggle">
+                <button
+                  class="type-btn active-expense"
+                  id="btn-expense"
+                  onclick="setType('expense')"
+                >
+                  − Expense
+                </button>
+                <button
+                  class="type-btn"
+                  id="btn-income"
+                  onclick="setType('income')"
+                >
+                  + Income
+                </button>
+              </div>
+
+              <!-- QUICK AMOUNT CHIPS -->
+              <div class="form-group">
+                <div class="chips-label">Quick Add / Subtract</div>
+                <div class="quick-chips" id="quick-chips">
+                  <span class="chip positive" onclick="adjustAmount(100)"
+                    >+100</span
+                  >
+                  <span class="chip positive" onclick="adjustAmount(500)"
+                    >+500</span
+                  >
+                  <span class="chip positive" onclick="adjustAmount(1000)"
+                    >+1K</span
+                  >
+                  <span class="chip positive" onclick="adjustAmount(10000)"
+                    >+10K</span
+                  >
+                  <span class="chip positive" onclick="adjustAmount(100000)"
+                    >+1L</span
+                  >
+                  <span class="chip positive" onclick="adjustAmount(1000000)"
+                    >+10L</span
+                  >
+                  <span class="chip negative" onclick="adjustAmount(-100)"
+                    >−100</span
+                  >
+                  <span class="chip negative" onclick="adjustAmount(-500)"
+                    >−500</span
+                  >
+                  <span class="chip negative" onclick="adjustAmount(-1000)"
+                    >−1K</span
+                  >
+                  <span class="chip negative" onclick="adjustAmount(-10000)"
+                    >−10K</span
+                  >
+                  <span class="chip negative" onclick="adjustAmount(-100000)"
+                    >−1L</span
+                  >
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Description *</label>
+                <input
+                  type="text"
+                  id="desc"
+                  placeholder="e.g. Monthly rent, Salary..."
+                  maxlength="60"
+                />
+                <div class="field-error" id="err-desc"></div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Amount (₹) *</label>
+                  <input
+                    type="number"
+                    id="amount"
+                    placeholder="0.00"
+                    min="0.01"
+                    step="0.01"
+                  />
+                  <div class="field-error" id="err-amount"></div>
+                </div>
+                <div class="form-group">
+                  <label>Category *</label>
+                  <select id="category">
+                    <option value="">— Select —</option>
+                    <option value="Food">🍜 Food</option>
+                    <option value="Transport">🚌 Transport</option>
+                    <option value="Shopping">🛒 Shopping</option>
+                    <option value="Entertainment">🎮 Entertainment</option>
+                    <option value="Health">💊 Health</option>
+                    <option value="Education">📚 Education</option>
+                    <option value="Utilities">💡 Utilities</option>
+                    <option value="Salary">💼 Salary</option>
+                    <option value="Freelance">💻 Freelance</option>
+                    <option value="Other">📦 Other</option>
+                  </select>
+                  <div class="field-error" id="err-category"></div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Date *</label>
+                <input type="date" id="date" />
+                <div class="field-error" id="err-date"></div>
+              </div>
+
+              <!-- Transaction Mode -->
+              <div class="form-group">
+                <label>Transaction Mode *</label>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;">
+                  <button type="button" class="tx-mode-btn active" id="mode-online" onclick="setTxMode('Online')" title="Online / UPI / Net Banking">
+                    <span style="font-size:16px;">📱</span><br><span>Online</span>
+                  </button>
+                  <button type="button" class="tx-mode-btn" id="mode-cash" onclick="setTxMode('Cash')" title="Cash payment">
+                    <span style="font-size:16px;">💵</span><br><span>Cash</span>
+                  </button>
+                  <button type="button" class="tx-mode-btn" id="mode-card" onclick="setTxMode('Card')" title="Debit / Credit Card">
+                    <span style="font-size:16px;">💳</span><br><span>Card</span>
+                  </button>
+                  <button type="button" class="tx-mode-btn" id="mode-bank" onclick="setTxMode('Bank')" title="Bank Transfer / NEFT / RTGS">
+                    <span style="font-size:16px;">🏦</span><br><span>Bank</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- From / To (Optional) -->
+              <div class="form-row">
+                <div class="form-group">
+                  <label>From <span style="color:var(--muted);font-size:9px;letter-spacing:0;text-transform:none;">(optional · debited from)</span></label>
+                  <input type="text" id="tx-from" placeholder="e.g. Rahul, HDFC Bank…" maxlength="40" />
+                </div>
+                <div class="form-group">
+                  <label>To <span style="color:var(--muted);font-size:9px;letter-spacing:0;text-transform:none;">(optional · credited to)</span></label>
+                  <input type="text" id="tx-to" placeholder="e.g. Zomato, Self…" maxlength="40" />
+                </div>
+              </div>
+
+              <!-- Invoice Upload -->
+              <div class="form-group">
+                <label
+                  >Invoice / Receipt
+                  <span
+                    style="
+                      color: var(--muted);
+                      font-size: 9px;
+                      letter-spacing: 0;
+                    "
+                    >(optional · JPG, PNG, PDF · max 5 MB)</span
+                  ></label
+                >
+                <div class="invoice-upload-area" id="upload-area">
+                  <input
+                    type="file"
+                    id="invoice-file"
+                    accept="image/jpeg,image/png,image/gif,image/webp,application/pdf"
+                    onchange="handleInvoiceSelect(event)"
+                  />
+                  <div class="upload-icon">📎</div>
+                  <div class="upload-text">
+                    Drop file here or <span>browse</span>
+                  </div>
+                </div>
+                <div class="invoice-preview" id="invoice-preview">
+                  <span id="preview-icon" style="font-size: 20px">🖼</span>
+                  <span class="invoice-preview-name" id="preview-name"></span>
+                  <span class="invoice-preview-size" id="preview-size"></span>
+                  <button
+                    class="invoice-remove"
+                    onclick="removeInvoice()"
+                    title="Remove file"
+                  >
+                    ✕
+                  </button>
+                </div>
+                <div class="field-error" id="err-invoice"></div>
+              </div>
+              <!-- Queued transactions preview -->
+              <div
+                id="queue-preview"
+                style="
+                  display: none;
+                  margin-top: 10px;
+                  background: var(--surface2);
+                  border: 1px solid var(--border);
+                  border-radius: 8px;
+                  padding: 10px 14px;
+                "
+              >
+                <div
+                  style="
+                    font-size: 10px;
+                    letter-spacing: 1.5px;
+                    text-transform: uppercase;
+                    color: var(--muted);
+                    margin-bottom: 8px;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                  "
+                >
+                  <span>Queued Transactions</span>
+                  <span
+                    id="queue-count-badge"
+                    style="
+                      background: var(--accent);
+                      color: #000;
+                      font-family: &quot;Exo 2&quot;, sans-serif;
+                      font-size: 10px;
+                      font-weight: 800;
+                      padding: 2px 8px;
+                      border-radius: 20px;
+                    "
+                    >0</span
+                  >
+                </div>
+                <div
+                  id="queue-list"
+                  style="
+                    max-height: 140px;
+                    overflow-y: auto;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 6px;
+                  "
+                ></div>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-top: 10px;
+                    padding-top: 10px;
+                    border-top: 1px solid var(--border);
+                  "
+                >
+                  <span style="font-size: 11px; color: var(--muted)"
+                    >Total queued:</span
+                  >
+                  <span
+                    id="queue-total"
+                    style="
+                      font-family: &quot;Exo 2&quot;, sans-serif;
+                      font-size: 13px;
+                      font-weight: 700;
+                      color: var(--accent);
+                    "
+                    >₹0.00</span
+                  >
+                </div>
+              </div>
+              <div
+                style="
+                  display: grid;
+                  grid-template-columns: 1fr 1fr;
+                  gap: 10px;
+                  margin-top: 4px;
+                "
+              >
+                <button
+                  class="add-btn"
+                  style="
+                    background: var(--surface2);
+                    color: var(--accent);
+                    border: 1px solid var(--accent);
+                    font-size: 12px;
+                  "
+                  onclick="queueTransaction()"
+                  title="Add to queue — submit all at once later"
+                >
+                  ＋ Add to Queue
+                </button>
+                <button
+                  class="add-btn"
+                  style="font-size: 12px"
+                  onclick="addTransaction()"
+                  title="Submit this transaction immediately"
+                >
+                  ✓ Submit Now
+                </button>
+              </div>
+              <button
+                id="submit-all-btn"
+                class="add-btn"
+                style="
+                  display: none;
+                  margin-top: 8px;
+                  background: linear-gradient(135deg, #f5c542, #ffd464);
+                  font-size: 13px;
+                "
+                onclick="submitAllQueued()"
+              >
+                ⚡ Submit All Queued (<span id="submit-all-count">0</span>)
+              </button>
+            </div>
+
+            <div class="chart-panel">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px;">
+                <div class="panel-title" style="margin-bottom:0;">Monthly Overview</div>
+                <div style="display:flex;gap:14px;align-items:center;">
+                  <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:3px;background:var(--income-color);display:inline-block;"></span>Income</span>
+                  <span style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);"><span style="width:10px;height:10px;border-radius:3px;background:var(--expense-color);display:inline-block;"></span>Expense</span>
+                </div>
+              </div>
+              <div id="bar-chart-html" style="display:flex;flex-direction:column;gap:6px;"></div>
+            </div>
+            <div class="transactions-panel">
+              <div class="tx-header">
+                <div class="panel-title" style="margin-bottom: 0">History</div>
+                <div class="filter-group">
+                  <button
+                    class="filter-btn active"
+                    onclick="filterTx('all', this)"
+                  >
+                    All
+                  </button>
+                  <button class="filter-btn" onclick="filterTx('income', this)">
+                    Income
+                  </button>
+                  <button
+                    class="filter-btn"
+                    onclick="filterTx('expense', this)"
+                  >
+                    Expense
+                  </button>
+                  <button class="filter-btn reset-btn" onclick="resetHistory()" title="Clear all transactions">Reset</button>
+                </div>
+              </div>
+              <ul class="tx-list" id="tx-list"></ul>
+            </div>
+          </div>
+
+          <div class="right-col">
+            <div class="stmt-panel">
+              <div class="panel-title">Download Statement</div>
+              <!-- Period toggle -->
+              <div style="display:grid;grid-template-columns:1fr 1fr 1fr;background:var(--surface2);border-radius:8px;padding:4px;gap:4px;margin-bottom:14px;">
+                <button class="type-btn active-income" id="stmt-period-monthly" style="font-size:10px;padding:8px;" onclick="setStmtPeriod('monthly')">📅 Monthly</button>
+                <button class="type-btn" id="stmt-period-yearly" style="font-size:10px;padding:8px;" onclick="setStmtPeriod('yearly')">📆 Yearly</button>
+                <button class="type-btn" id="stmt-period-custom" style="font-size:10px;padding:8px;" onclick="setStmtPeriod('custom')">🎛 Custom</button>
+              </div>
+              <div class="stmt-row" id="stmt-month-row">
+                <div class="form-group" style="margin-bottom: 0">
+                  <label>Month</label>
+                  <select id="stmt-month">
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0">
+                  <label>Year</label>
+                  <input type="number" id="stmt-year" min="2000" max="2099" />
+                </div>
+              </div>
+              <div class="form-group" id="stmt-year-only-row" style="display:none;margin-bottom:14px;">
+                <label>Year</label>
+                <input type="number" id="stmt-year-only" min="2000" max="2099" />
+              </div>
+              <button class="dl-btn" id="stmt-dl-btn" onclick="downloadStatementPDF()">
+                ⬇ Download PDF
+              </button>
+
+              <!-- ── CUSTOM STATEMENT PANEL ── -->
+              <div class="custom-stmt-panel" id="custom-stmt-panel">
+                <div class="custom-stmt-section">📅 Date Range</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px;">
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label>From Date</label>
+                    <input type="date" id="custom-from-date" oninput="updateCustomPreview()" />
+                  </div>
+                  <div class="form-group" style="margin-bottom:0;">
+                    <label>To Date</label>
+                    <input type="date" id="custom-to-date" oninput="updateCustomPreview()" />
+                  </div>
+                </div>
+
+                <div class="custom-stmt-section">💳 Transaction Type</div>
+                <div class="tx-type-toggle">
+                  <button class="tx-type-btn sel-all" id="ctype-all" onclick="setCustomType('all')">⚡ All</button>
+                  <button class="tx-type-btn" id="ctype-income" onclick="setCustomType('income')">↑ Income</button>
+                  <button class="tx-type-btn" id="ctype-expense" onclick="setCustomType('expense')">↓ Expense</button>
+                </div>
+
+                <div class="custom-stmt-section">🏷 Categories <span style="color:var(--muted);font-size:9px;letter-spacing:0;text-transform:none;">(tap to toggle)</span></div>
+                <div class="cat-chip-grid" id="custom-cat-chips">
+                  <button class="cat-chip cat-chip-all selected" data-cat="ALL" onclick="toggleCustomCat('ALL')">✦ All Categories</button>
+                  <button class="cat-chip" data-cat="Food" onclick="toggleCustomCat('Food')">🍔 Food</button>
+                  <button class="cat-chip" data-cat="Transport" onclick="toggleCustomCat('Transport')">🚗 Transport</button>
+                  <button class="cat-chip" data-cat="Shopping" onclick="toggleCustomCat('Shopping')">🛍 Shopping</button>
+                  <button class="cat-chip" data-cat="Entertainment" onclick="toggleCustomCat('Entertainment')">🎮 Entertainment</button>
+                  <button class="cat-chip" data-cat="Health" onclick="toggleCustomCat('Health')">💊 Health</button>
+                  <button class="cat-chip" data-cat="Education" onclick="toggleCustomCat('Education')">📚 Education</button>
+                  <button class="cat-chip" data-cat="Utilities" onclick="toggleCustomCat('Utilities')">💡 Utilities</button>
+                  <button class="cat-chip" data-cat="Salary" onclick="toggleCustomCat('Salary')">💼 Salary</button>
+                  <button class="cat-chip" data-cat="Freelance" onclick="toggleCustomCat('Freelance')">💻 Freelance</button>
+                  <button class="cat-chip" data-cat="Other" onclick="toggleCustomCat('Other')">📦 Other</button>
+                </div>
+
+                <div class="custom-stmt-preview" id="custom-stmt-preview">
+                  Select a date range to preview matching transactions.
+                </div>
+
+                <button class="dl-btn" style="margin-top:12px;" onclick="downloadCustomStatementPDF()">
+                  🎛 Download Custom PDF
+                </button>
+              </div>
+            </div>
+
+            <div class="donut-panel">
+              <div class="panel-title" style="justify-content: center">
+                Expense Breakdown
+              </div>
+              <div class="donut-wrap">
+                <canvas id="donutChart" width="160" height="160"></canvas>
+                <div class="donut-center">
+                  <div class="donut-center-pct" id="donut-pct">0%</div>
+                  <div class="donut-center-label">SPENT</div>
+                </div>
+              </div>
+              <div
+                class="legend"
+                id="donut-legend"
+                style="justify-content: center"
+              ></div>
+            </div>
+
+            <div class="budget-panel">
+              <div class="panel-title">Top Categories</div>
+              <div id="category-bars">
+                <div
+                  class="empty-state"
+                  style="padding: 20px 0; font-size: 12px"
+                >
+                  No data yet
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ TAB: CALCULATORS ══════════════════ -->
+      <div class="tab-panel" id="tab-tools">
+        <div class="tools-grid">
+          <!-- Simple Calculator -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">🧮</span> Calculator
+            </div>
+            <div class="calc-display">
+              <div class="calc-expr" id="calc-expr">&nbsp;</div>
+              <div class="calc-result" id="calc-result">0</div>
+            </div>
+            <div class="calc-grid">
+              <button class="calc-btn clear" onclick="calcClear()">C</button>
+              <button class="calc-btn op" onclick="calcSign()">+/−</button>
+              <button class="calc-btn op" onclick="calcPct()">%</button>
+              <button class="calc-btn op" onclick="calcOp('/')">÷</button>
+              <button class="calc-btn" onclick="calcNum('7')">7</button>
+              <button class="calc-btn" onclick="calcNum('8')">8</button>
+              <button class="calc-btn" onclick="calcNum('9')">9</button>
+              <button class="calc-btn op" onclick="calcOp('*')">×</button>
+              <button class="calc-btn" onclick="calcNum('4')">4</button>
+              <button class="calc-btn" onclick="calcNum('5')">5</button>
+              <button class="calc-btn" onclick="calcNum('6')">6</button>
+              <button class="calc-btn op" onclick="calcOp('-')">−</button>
+              <button class="calc-btn" onclick="calcNum('1')">1</button>
+              <button class="calc-btn" onclick="calcNum('2')">2</button>
+              <button class="calc-btn" onclick="calcNum('3')">3</button>
+              <button class="calc-btn op" onclick="calcOp('+')">+</button>
+              <button class="calc-btn span2" onclick="calcNum('0')">0</button>
+              <button class="calc-btn" onclick="calcDot()">.</button>
+              <button class="calc-btn eq" onclick="calcEquals()">=</button>
+            </div>
+          </div>
+
+          <!-- Loan EMI Calculator -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">🏦</span> Loan & EMI Calculator
+            </div>
+            <div class="form-group">
+              <label>Loan Amount (₹)</label>
+              <input
+                type="number"
+                id="loan-amount"
+                placeholder="e.g. 500000"
+                oninput="calcEMI()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Annual Interest Rate (%)</label>
+              <input
+                type="number"
+                id="loan-rate"
+                placeholder="e.g. 8.5"
+                step="0.01"
+                oninput="calcEMI()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Loan Tenure (Months)</label>
+              <input
+                type="number"
+                id="loan-tenure"
+                placeholder="e.g. 60"
+                oninput="calcEMI()"
+              />
+            </div>
+            <div class="result-box" id="emi-result" style="display: none">
+              <div class="result-row">
+                <span class="result-label">Monthly EMI</span
+                ><span class="result-value highlight" id="emi-val">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Total Payment</span
+                ><span class="result-value" id="emi-total">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Total Interest</span
+                ><span class="result-value red" id="emi-interest">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Principal</span
+                ><span class="result-value" id="emi-principal">—</span>
+              </div>
+            </div>
+            <div id="amort-wrap-container" style="display: none">
+              <div
+                style="
+                  font-size: 10px;
+                  letter-spacing: 1.5px;
+                  text-transform: uppercase;
+                  color: var(--muted);
+                  margin-top: 16px;
+                  margin-bottom: 6px;
+                "
+              >
+                Amortization Schedule
+              </div>
+              <div class="amort-wrap">
+                <table class="amort-table">
+                  <thead>
+                    <tr>
+                      <th>Month</th>
+                      <th>EMI</th>
+                      <th>Principal</th>
+                      <th>Interest</th>
+                      <th>Balance</th>
+                    </tr>
+                  </thead>
+                  <tbody id="amort-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ TAB: CURRENCY ══════════════════ -->
+      <div class="tab-panel" id="tab-currency">
+        <div class="tools-grid">
+          <div class="tool-card full">
+            <div class="tool-title">
+              <span class="icon">💱</span> Currency Converter
+              <span class="live-badge" id="rate-badge">LIVE</span>
+              <span
+                class="loading-spinner"
+                id="curr-spinner"
+                style="display: none"
+              ></span>
+            </div>
+            <p class="info-text">
+              Fetches live exchange rates. Base currency: INR (Indian Rupee).
+            </p>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Amount</label>
+                <input
+                  type="number"
+                  id="curr-amount"
+                  placeholder="Enter amount"
+                  value="1000"
+                  oninput="convertCurrency()"
+                />
+              </div>
+              <div class="form-group">
+                <label>From</label>
+                <select id="curr-from" onchange="convertCurrency()">
+                  <option value="INR" selected>🇮🇳 INR — Indian Rupee</option>
+                  <option value="USD">🇺🇸 USD — US Dollar</option>
+                  <option value="EUR">🇪🇺 EUR — Euro</option>
+                  <option value="GBP">🇬🇧 GBP — British Pound</option>
+                  <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+                  <option value="AED">🇦🇪 AED — UAE Dirham</option>
+                  <option value="SGD">🇸🇬 SGD — Singapore Dollar</option>
+                  <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+                  <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+                  <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+                  <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+                  <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>To</label>
+                <select id="curr-to" onchange="convertCurrency()">
+                  <option value="INR">🇮🇳 INR — Indian Rupee</option>
+                  <option value="USD" selected>🇺🇸 USD — US Dollar</option>
+                  <option value="EUR">🇪🇺 EUR — Euro</option>
+                  <option value="GBP">🇬🇧 GBP — British Pound</option>
+                  <option value="JPY">🇯🇵 JPY — Japanese Yen</option>
+                  <option value="AED">🇦🇪 AED — UAE Dirham</option>
+                  <option value="SGD">🇸🇬 SGD — Singapore Dollar</option>
+                  <option value="CAD">🇨🇦 CAD — Canadian Dollar</option>
+                  <option value="AUD">🇦🇺 AUD — Australian Dollar</option>
+                  <option value="CHF">🇨🇭 CHF — Swiss Franc</option>
+                  <option value="CNY">🇨🇳 CNY — Chinese Yuan</option>
+                  <option value="SAR">🇸🇦 SAR — Saudi Riyal</option>
+                </select>
+              </div>
+            </div>
+            <div class="currency-display">
+              <div class="currency-result" id="curr-result">—</div>
+              <div class="currency-rate" id="curr-rate">Loading rates…</div>
+            </div>
+            <button class="currency-swap" onclick="swapCurrency()">
+              ⇅ Swap Currencies
+            </button>
+
+            <!-- Multi-currency snapshot -->
+            <div style="margin-top: 24px">
+              <div class="panel-title" style="margin-bottom: 12px">
+                INR Snapshot — 1000 ₹ =
+              </div>
+              <div
+                id="curr-snapshot"
+                style="
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+                  gap: 10px;
+                "
+              ></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════ TAB: SAVINGS & INVEST ══════════════════ -->
+      <div class="tab-panel" id="tab-savings">
+        <div class="tools-grid">
+          <!-- SIP Calculator -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">📈</span> SIP Calculator
+            </div>
+            <div class="form-group">
+              <label>Monthly Investment (₹)</label>
+              <input
+                type="number"
+                id="sip-monthly"
+                placeholder="e.g. 5000"
+                oninput="calcSIP()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Expected Annual Return (%)</label>
+              <input
+                type="number"
+                id="sip-rate"
+                placeholder="e.g. 12"
+                step="0.1"
+                oninput="calcSIP()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Time Period (Years)</label>
+              <input
+                type="number"
+                id="sip-years"
+                placeholder="e.g. 10"
+                oninput="calcSIP()"
+              />
+            </div>
+            <div class="result-box" id="sip-result" style="display: none">
+              <div class="result-row">
+                <span class="result-label">Invested Amount</span
+                ><span class="result-value" id="sip-invested">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Est. Returns</span
+                ><span
+                  class="result-value"
+                  style="color: var(--savings-color)"
+                  id="sip-returns"
+                  >—</span
+                >
+              </div>
+              <div class="result-row">
+                <span class="result-label">Total Value</span
+                ><span class="result-value highlight" id="sip-total">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Wealth Gained</span
+                ><span
+                  class="result-value"
+                  style="color: var(--savings-color)"
+                  id="sip-wealth"
+                  >—</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- FD Calculator -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">🏛️</span> FD Calculator
+            </div>
+            <div class="savings-tabs">
+              <button
+                class="savings-tab active"
+                id="fd-simple-tab"
+                onclick="setFDMode('simple')"
+              >
+                Simple Interest
+              </button>
+              <button
+                class="savings-tab"
+                id="fd-compound-tab"
+                onclick="setFDMode('compound')"
+              >
+                Compound Interest
+              </button>
+            </div>
+            <div class="form-group">
+              <label>Principal Amount (₹)</label>
+              <input
+                type="number"
+                id="fd-principal"
+                placeholder="e.g. 100000"
+                oninput="calcFD()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Annual Interest Rate (%)</label>
+              <input
+                type="number"
+                id="fd-rate"
+                placeholder="e.g. 7.5"
+                step="0.01"
+                oninput="calcFD()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Tenure (Years)</label>
+              <input
+                type="number"
+                id="fd-years"
+                placeholder="e.g. 5"
+                step="0.5"
+                oninput="calcFD()"
+              />
+            </div>
+            <div class="form-group" id="fd-freq-group" style="display: none">
+              <label>Compounding Frequency</label>
+              <select id="fd-freq" onchange="calcFD()">
+                <option value="1">Annually</option>
+                <option value="2">Half-Yearly</option>
+                <option value="4" selected>Quarterly</option>
+                <option value="12">Monthly</option>
+              </select>
+            </div>
+            <div class="result-box" id="fd-result" style="display: none">
+              <div class="result-row">
+                <span class="result-label">Principal</span
+                ><span class="result-value" id="fd-principal-val">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Interest Earned</span
+                ><span
+                  class="result-value"
+                  style="color: var(--savings-color)"
+                  id="fd-interest-val"
+                  >—</span
+                >
+              </div>
+              <div class="result-row">
+                <span class="result-label">Maturity Amount</span
+                ><span class="result-value highlight" id="fd-maturity">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PPF / Goal Planner -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">🎯</span> Goal Planner
+            </div>
+            <div class="form-group">
+              <label>Goal Name</label>
+              <input
+                type="text"
+                id="goal-name"
+                placeholder="e.g. Emergency Fund, Car, House"
+              />
+            </div>
+            <div class="form-group">
+              <label>Target Amount (₹)</label>
+              <input
+                type="number"
+                id="goal-target"
+                placeholder="e.g. 500000"
+                oninput="calcGoal()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Current Savings (₹)</label>
+              <input
+                type="number"
+                id="goal-current"
+                placeholder="e.g. 50000"
+                oninput="calcGoal()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Monthly Savings (₹)</label>
+              <input
+                type="number"
+                id="goal-monthly"
+                placeholder="e.g. 10000"
+                oninput="calcGoal()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Expected Return (%)</label>
+              <input
+                type="number"
+                id="goal-rate"
+                placeholder="e.g. 8"
+                step="0.1"
+                oninput="calcGoal()"
+              />
+            </div>
+            <div class="result-box" id="goal-result" style="display: none">
+              <div class="result-row">
+                <span class="result-label">Goal</span
+                ><span class="result-value" id="goal-name-val">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Time to Goal</span
+                ><span class="result-value highlight" id="goal-time">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Amount Needed</span
+                ><span class="result-value" id="goal-needed">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Progress</span>
+                <span
+                  class="result-value"
+                  id="goal-pct"
+                  style="color: var(--savings-color)"
+                  >—</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Inflation Calc -->
+          <div class="tool-card">
+            <div class="tool-title">
+              <span class="icon">📉</span> Inflation Calculator
+            </div>
+            <div class="form-group">
+              <label>Current Amount (₹)</label>
+              <input
+                type="number"
+                id="inf-amount"
+                placeholder="e.g. 100000"
+                oninput="calcInflation()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Inflation Rate (% p.a.)</label>
+              <input
+                type="number"
+                id="inf-rate"
+                placeholder="e.g. 6"
+                step="0.1"
+                value="6"
+                oninput="calcInflation()"
+              />
+            </div>
+            <div class="form-group">
+              <label>Years into the Future</label>
+              <input
+                type="number"
+                id="inf-years"
+                placeholder="e.g. 10"
+                oninput="calcInflation()"
+              />
+            </div>
+            <div class="result-box" id="inf-result" style="display: none">
+              <div class="result-row">
+                <span class="result-label">Today's Value</span
+                ><span class="result-value" id="inf-today">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Future Cost</span
+                ><span class="result-value red" id="inf-future">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Value Lost</span
+                ><span class="result-value red" id="inf-lost">—</span>
+              </div>
+              <div class="result-row">
+                <span class="result-label">Purchasing Power</span
+                ><span
+                  class="result-value"
+                  id="inf-power"
+                  style="color: var(--savings-color)"
+                  >—</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Invoice Viewer Modal -->
+    <div
+      class="modal-overlay"
+      id="invoice-modal"
+      onclick="closeModalOverlay(event)"
+    >
+      <div class="modal">
+        <button class="modal-close" onclick="closeInvoiceModal()">✕</button>
+        <div class="modal-title" id="modal-title"></div>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <!-- Transaction Detail Bottom Sheet (mobile) -->
+    <div id="tx-detail-overlay" onclick="closeTxDetail(event)" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;backdrop-filter:blur(4px);align-items:flex-end;justify-content:center;">
+      <div id="tx-detail-sheet" style="background:var(--surface);border:1px solid var(--border);border-radius:20px 20px 0 0;padding:24px 20px 36px;width:100%;max-width:600px;position:relative;transform:translateY(100%);transition:transform 0.32s cubic-bezier(.4,0,.2,1);">
+        <!-- drag handle -->
+        <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 20px;"></div>
+        <button onclick="closeTxDetailDirect()" style="position:absolute;top:20px;right:20px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:30px;height:30px;border-radius:50%;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+
+        <!-- icon + title + amount -->
+        <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px;">
+          <div id="txd-icon" style="width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;"></div>
+          <div style="flex:1;min-width:0;">
+            <div id="txd-desc" style="font-family:'Exo 2', sans-serif;font-size:17px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
+            <div id="txd-type" style="font-size:11px;letter-spacing:1.5px;text-transform:uppercase;margin-top:3px;"></div>
+          </div>
+          <div id="txd-amount" style="font-family:'Exo 2', sans-serif;font-size:22px;font-weight:800;flex-shrink:0;"></div>
+        </div>
+
+        <!-- detail rows -->
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:12px;overflow:hidden;">
+          <div class="txd-row"><span class="txd-label">📅 Date</span><span id="txd-date" class="txd-val"></span></div>
+          <div class="txd-row"><span class="txd-label">🏷 Category</span><span id="txd-cat" class="txd-val"></span></div>
+          <div class="txd-row" id="txd-mode-row"><span class="txd-label">💳 Mode</span><span id="txd-mode" class="txd-val"></span></div>
+          <div class="txd-row" id="txd-from-row"><span class="txd-label">📤 From</span><span id="txd-from" class="txd-val"></span></div>
+          <div class="txd-row" id="txd-to-row"><span class="txd-label">📥 To</span><span id="txd-to" class="txd-val"></span></div>
+          <div class="txd-row" id="txd-invoice-row"><span class="txd-label">📎 Invoice</span><span id="txd-invoice" class="txd-val"></span></div>
+        </div>
+
+        <!-- delete button -->
+        <button id="txd-delete" style="width:100%;margin-top:16px;padding:14px;background:rgba(255,107,107,0.1);border:1px solid rgba(255,107,107,0.3);border-radius:10px;color:var(--expense-color);font-family:'Exo 2', sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s;">🗑 Delete Transaction</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script src="app.js"></script>
+
+    <!-- ═══════════════════════════════════════════════
+         MOBILE FULL-PAGE OVERLAYS (one per non-tracker tab)
+         Visible only on screens ≤768px via CSS + JS
+    ═══════════════════════════════════════════════ -->
+    <div class="mobile-page-overlay" id="mobile-overlay-tools">
+      <div class="mobile-page-header">
+        <button class="mobile-back-btn" onclick="mobileBack('tools')">&#8592; Back</button>
+        <div class="mobile-page-title">🧮 Calculators</div>
+      </div>
+      <div class="mobile-page-content"></div>
+    </div>
+
+    <div class="mobile-page-overlay" id="mobile-overlay-currency">
+      <div class="mobile-page-header">
+        <button class="mobile-back-btn" onclick="mobileBack('currency')">&#8592; Back</button>
+        <div class="mobile-page-title">💱 Currency</div>
+      </div>
+      <div class="mobile-page-content"></div>
+    </div>
+
+    <div class="mobile-page-overlay" id="mobile-overlay-savings">
+      <div class="mobile-page-header">
+        <button class="mobile-back-btn" onclick="mobileBack('savings')">&#8592; Back</button>
+        <div class="mobile-page-title">💰 Savings & Invest</div>
+      </div>
+      <div class="mobile-page-content"></div>
+    </div>
+
+  </body>
+</html>
